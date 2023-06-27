@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+    integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Coiny&display=swap" rel="stylesheet">
+  <title>Document</title>
+  <style>
+    .green {
+      width: 50%;
+      height: 50%;
+      background: lightgreen;
+    }
+
+    .blue {
+      width: 50%;
+      height: 50%;
+      background: lightblue;
+    }
+
+    .red {
+      width: 50%;
+      height: 50%;
+      background: lightcoral;
+    }
+
+    .black {
+      width: 50%;
+      height: 50%;
+      background: lightslategrey;
+    }
+
+    .game-box {
+      display: flex;
+      position: relative;
+      width: 60vw;
+      height: 60vh;
+      margin: auto;
+      flex-wrap: wrap;
+    }
+
+    #tab {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border: 10px solid #000;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, .8);
+      cursor: pointer;
+    }
+
+    p {
+      font-size: 24px;
+      margin: 5px;
+    }
+
+    h1,
+    h2,
+    p {
+      font-family: 'Coiny', cursive;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-box">
+    <div id="tab">
+      <h1 id="ready">Ready!!</h1>
+      <p id="text">tab to start~</p>
+      <h2 id="level">LEVEL:0</h2>
+    </div>
+
+    <div class="block green" id="1"></div>
+    <div class="block blue" id="2"></div>
+    <div class="block red" id="3"></div>
+    <div class="block black" id="4"></div>
+  </div>
+
+
+  <script>
+  let pattern = [];
+  let usedPattern = [];
+  let level = 0;
+  let gameCheck = false;
+
+  function addPattern() {
+    let pValue = randNum(1, 4);
+
+    pattern.push(pValue);
+  }
+
+
+  function playPattern() {
+    for (let i = 0; i < pattern.length; i++) {
+      let delayTime = i * 600;
+      setTimeout(flashSquare, delayTime);
+    }
+
+  }
+
+  function flashSquare() {
+
+    let item = pattern.pop();
+    gameCheck = true;
+    $('#' + item).animate({
+      opacity: 0.2
+    }, 200).animate({
+      opacity: 1
+    }, 100);
+    usedPattern.push(item);
+    if (pattern.length <= 0) {
+      createClicks();
+    }
+  } 
+
+  function createClicks() {
+    $('.block').click(function() {
+      let item = usedPattern.shift();
+
+      let squareId = $(this).attr('id');
+
+      $(this).animate({opacity:.2},200).animate({opacity:1},100)
+
+      if (item == squareId) {
+
+        pattern.push(item);
+
+        if (usedPattern.length <= 0) {
+          level++;
+          $('#level').html('Level: ' + level);
+
+          removeClicks();
+
+          addPattern();
+
+          setTimeout(playPattern, 800);
+        }
+
+      } else {
+        gameCheck = false;
+        $('h1').html('Game Over').css({
+          fontSize: 32,
+          marginBottom: 15,
+          paddingTop: 15
+        });
+        $('p').html('點擊中間位置重新開始');
+        pattern = [];
+        usedPattern = [];
+      }
+    }); 
+  } 
+
+  function removeClicks() {
+    $('.block').unbind();
+  }
+ 
+  function startGame() {
+    removeClicks();
+    resetGame();
+    addPattern();
+    addPattern();
+    playPattern(); 
+  }
+
+  function resetGame() {
+    level = 0;
+    $('#level').html('Level: ' + level);
+    $('h1').html('GO').css({
+      fontSize: 32,
+      marginBottom: 0,
+      paddingTop: 0
+    });
+    $('p').html('請點擊閃爍位置');
+  }
+
+  $('#tab').click(function() {
+    if(gameCheck === false){
+      startGame();
+    } 
+  });
+
+  function randNum(min, max) {
+    return Math.round(Math.random() * (max - min)) + min;
+  }
+
+  </script>
+</body>
+
+</html>
